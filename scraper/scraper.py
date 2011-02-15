@@ -3,7 +3,7 @@
 import json, urllib, libxml2, os, os.path, datetime, locale
 from datetime import datetime, timedelta
 
-API_VERSION = '0.1'
+API_VERSION = '0.2'
 API_PATH = './resto/api/%s/week/'
 
 def get_menu_page (week):
@@ -24,6 +24,13 @@ def get_meat_and_price (meat):
 	result['price'] = meat.content[:8]
 	result['name'] = name.strip()
 	return result
+
+def get_vegetables (vegetables):
+    name = vegetables.content.strip()
+
+    result = {}
+    result['name'] = name
+    return result
 
 def parse_menu_from_html (page):
 	print "Parsing weekmenu webpage to an object tree"
@@ -59,12 +66,12 @@ def parse_menu_from_html (page):
 				menu[day]['meat'] = []
 				menu[day]['meat'].append(get_meat_and_price(fields[2]))
 				menu[day]['vegetables'] = []
-				menu[day]['vegetables'].append(fields[3].content.strip())
+				menu[day]['vegetables'].append(get_vegetables(fields[3]))
 		elif len(fields[1].content) != 0:
 			# second row of a day
 			menu[day]['soup']['price'] = fields[1].content
 			menu[day]['meat'].append(get_meat_and_price(fields[2]))
-			menu[day]['vegetables'].append(fields[3].content.strip())
+			menu[day]['vegetables'].append(get_vegetables(fields[3]))
 		else:
 			# the third and forth row of a day
 			menu[day]['meat'].append(get_meat_and_price(fields[2]))
